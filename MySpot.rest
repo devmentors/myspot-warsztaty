@@ -1,0 +1,18 @@
+@url = http://localhost:5000
+
+###
+GET {{url}}
+
+###
+GET {{url}}/parking-spots
+
+###
+GET {{url}}/parking-spots/
+
+###
+POST {{url}}/parking-spots
+Content-Type: application/json
+
+{
+    "name": "P1"
+}
