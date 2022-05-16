@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using MySpot.Api.Models;
+using MySpot.Api.Commands;
 using MySpot.Api.Services;
 
 namespace MySpot.Api.Controllers;
@@ -8,21 +8,21 @@ namespace MySpot.Api.Controllers;
 [Route("parking-spots/{parkingSpotId:guid}/reservations")]
 public class ReservationsController : ControllerBase
 {
+    private readonly ICommandHandler<AddReservation> _addReservationHandler;
     private readonly IParkingSpotsService _parkingSpotsService;
 
-    public ReservationsController(IParkingSpotsService parkingSpotsService)
+    public ReservationsController(ICommandHandler<AddReservation> addReservationHandler,
+        IParkingSpotsService parkingSpotsService)
     {
+        _addReservationHandler = addReservationHandler;
         _parkingSpotsService = parkingSpotsService;
     }
 
     [HttpPost]
-    public ActionResult Post(Guid parkingSpotId, Reservation reservation)
+    public ActionResult Post(Guid parkingSpotId, AddReservation command)
     {
-        if (_parkingSpotsService.AddReservation(parkingSpotId, reservation) is false)
-        {
-            return BadRequest();
-        }
-
+        command = command with {ReservationId = Guid.NewGuid(), ParkingSpotId = parkingSpotId};
+        _addReservationHandler.Handle(command);
         return NoContent();
     }
 

@@ -1,4 +1,3 @@
-using System;
 using Microsoft.Extensions.DependencyInjection;
 using MySpot.Api.Services;
 using Xunit;

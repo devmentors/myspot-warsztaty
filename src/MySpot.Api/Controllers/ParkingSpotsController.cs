@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MySpot.Api.Commands;
 using MySpot.Api.DTO;
-using MySpot.Api.Models;
 using MySpot.Api.Services;
 
 namespace MySpot.Api.Controllers;
