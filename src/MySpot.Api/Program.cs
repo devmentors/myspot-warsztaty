@@ -1,4 +1,7 @@
 using MySpot.Api;
+using MySpot.Api.Commands;
+using MySpot.Api.Commands.Handlers;
+using MySpot.Api.Repositories;
 using MySpot.Api.Services;
 using Serilog;
 
@@ -11,6 +14,8 @@ builder.Host.UseSerilog((context, logger) =>
 });
 
 builder.Services
+    .AddTransient<ICommandHandler<AddParkingSpot>, AddParkingSpotHandler>()
+    .AddTransient<IParkingSpotRepository, ParkingSpotRepository>()
     .AddSingleton<IParkingSpotsService, ParkingSpotsService>()
     .AddSingleton<IClock, Clock>()
     .Configure<ApiOptions>(builder.Configuration.GetSection("api"))

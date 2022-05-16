@@ -1,21 +1,23 @@
 using MySpot.Api.Commands;
 using MySpot.Api.DTO;
 using MySpot.Api.Models;
+using MySpot.Api.Repositories;
 
 namespace MySpot.Api.Services;
 
 public class ParkingSpotsService : IParkingSpotsService
 {
+    private readonly IParkingSpotRepository _parkingSpotRepository;
     private readonly ILogger<ParkingSpotsService> _logger;
-    private readonly List<ParkingSpot> _parkingSpots = new();
 
-    public ParkingSpotsService(ILogger<ParkingSpotsService> logger)
+    public ParkingSpotsService(IParkingSpotRepository parkingSpotRepository, ILogger<ParkingSpotsService> logger)
     {
+        _parkingSpotRepository = parkingSpotRepository;
         _logger = logger;
     }
 
     public IEnumerable<ParkingSpotDto> GetParkingSpots()
-        => _parkingSpots.Select(x => new ParkingSpotDto
+        => _parkingSpotRepository.GetAll().Select(x => new ParkingSpotDto
         {
             Id = x.Id,
             Name = x.Name
@@ -23,7 +25,7 @@ public class ParkingSpotsService : IParkingSpotsService
 
     public ParkingSpotDetailsDto GetParkingSpot(Guid id)
     {
-        var parkingSpot = _parkingSpots.SingleOrDefault(x => x.Id == id);
+        var parkingSpot = _parkingSpotRepository.Get(id);
 
         return parkingSpot is null
             ? null
@@ -54,7 +56,7 @@ public class ParkingSpotsService : IParkingSpotsService
             Name = command.Name,
             Reservations = new List<Reservation>()
         };
-        _parkingSpots.Add(parkingSpot);
+        _parkingSpotRepository.Add(parkingSpot);
         _logger.LogInformation("Added a parking with spot ID: {ParkingSpotId}", parkingSpot.Id);
         
         return true;
@@ -62,19 +64,19 @@ public class ParkingSpotsService : IParkingSpotsService
 
     public bool DeleteParkingSpot(Guid id)
     {
-        var parkingSpot = _parkingSpots.SingleOrDefault(x => x.Id == id);
+        var parkingSpot = _parkingSpotRepository.Get(id);
         if (parkingSpot is null)
         {
             return false;
         }
 
-        _parkingSpots.Remove(parkingSpot);
+        _parkingSpotRepository.Delete(parkingSpot);
         return true;
     }
 
     public bool AddReservation(Guid parkingSpotId, Reservation reservation)
     {
-        var parkingSpot = _parkingSpots.SingleOrDefault(x => x.Id == parkingSpotId);
+        var parkingSpot = _parkingSpotRepository.Get(parkingSpotId);
         if (parkingSpot is null)
         {
             return false;
@@ -105,7 +107,7 @@ public class ParkingSpotsService : IParkingSpotsService
 
     public bool DeleteReservation(Guid parkingSpotId, Guid reservationId)
     {
-        var parkingSpot = _parkingSpots.SingleOrDefault(x => x.Id == parkingSpotId);
+        var parkingSpot = _parkingSpotRepository.Get(parkingSpotId);
         if (parkingSpot is null)
         {
             return false;
@@ -118,6 +120,7 @@ public class ParkingSpotsService : IParkingSpotsService
         }
 
         parkingSpot.Reservations.Remove(reservation);
+        _parkingSpotRepository.Update(parkingSpot);
         return true;
     }
 }

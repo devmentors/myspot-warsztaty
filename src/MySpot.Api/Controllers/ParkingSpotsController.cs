@@ -10,10 +10,13 @@ namespace MySpot.Api.Controllers;
 [Route("parking-spots")]
 public class ParkingSpotsController : ControllerBase
 {
+    private readonly ICommandHandler<AddParkingSpot> _addParkingSpotHandler;
     private readonly IParkingSpotsService _parkingSpotsService;
 
-    public ParkingSpotsController(IParkingSpotsService parkingSpotsService)
+    public ParkingSpotsController(ICommandHandler<AddParkingSpot> addParkingSpotHandler,
+        IParkingSpotsService parkingSpotsService)
     {
+        _addParkingSpotHandler = addParkingSpotHandler;
         _parkingSpotsService = parkingSpotsService;
     }
 
@@ -37,11 +40,7 @@ public class ParkingSpotsController : ControllerBase
     public ActionResult Post(AddParkingSpot command)
     {
         command = command with {Id = Guid.NewGuid()};
-        if (_parkingSpotsService.AddParkingSpot(command) is false)
-        {
-            return BadRequest();
-        }
-        
+        _addParkingSpotHandler.Handle(command);
         return CreatedAtAction(nameof(Get), new {id = command.Id}, null);
     }
     
