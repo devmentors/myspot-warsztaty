@@ -36,6 +36,7 @@ public class ParkingSpotsController : ControllerBase
     [HttpPost]
     public ActionResult Post(AddParkingSpot command)
     {
+        command = command with {Id = Guid.NewGuid()};
         if (_parkingSpotsService.AddParkingSpot(command) is false)
         {
             return BadRequest();
