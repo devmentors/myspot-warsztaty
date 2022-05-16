@@ -8,7 +8,12 @@ namespace MySpot.Api.Controllers;
 [Route("parking-spots")]
 public class ParkingSpotsController : ControllerBase
 {
-    private readonly ParkingSpotsService _parkingSpotsService = new();
+    private readonly ParkingSpotsService _parkingSpotsService;
+
+    public ParkingSpotsController(ParkingSpotsService parkingSpotsService)
+    {
+        _parkingSpotsService = parkingSpotsService;
+    }
 
     [HttpGet]
     public ActionResult<IEnumerable<ParkingSpot>> Get()

@@ -1,4 +1,5 @@
 @url = http://localhost:5000
+@parkingSpotId = cf1ebb74-1b33-4496-b833-0156053bbd42
 
 ###
 GET {{url}}
@@ -7,7 +8,7 @@ GET {{url}}
 GET {{url}}/parking-spots
 
 ###
-GET {{url}}/parking-spots/
+GET {{url}}/parking-spots/{{parkingSpotId}}
 
 ###
 POST {{url}}/parking-spots
@@ -15,4 +16,14 @@ Content-Type: application/json
 
 {
     "name": "P1"
+}
+
+
+###
+POST {{url}}/parking-spots/{{parkingSpotId}}/reservations
+Content-Type: application/json
+
+{
+    "licensePlate": "ABC123",
+    "date": "2022-05-17"
 }
