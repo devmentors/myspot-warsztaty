@@ -1,5 +1,5 @@
 @url = http://localhost:5000
-@parkingSpotId = cf1ebb74-1b33-4496-b833-0156053bbd42
+@parkingSpotId = 7711ff63-afab-4ae6-ad71-09f2afafa60f
 
 ###
 GET {{url}}

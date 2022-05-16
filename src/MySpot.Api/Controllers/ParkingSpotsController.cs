@@ -8,23 +8,21 @@ namespace MySpot.Api.Controllers;
 [Route("parking-spots")]
 public class ParkingSpotsController : ControllerBase
 {
-    private readonly ParkingSpotsService _parkingSpotsService;
+    private readonly IParkingSpotsService _parkingSpotsService;
 
-    public ParkingSpotsController(ParkingSpotsService parkingSpotsService)
+    public ParkingSpotsController(IParkingSpotsService parkingSpotsService)
     {
         _parkingSpotsService = parkingSpotsService;
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<ParkingSpot>> Get()
-        => _parkingSpotsService.GetParkingSpots();
+    public ActionResult<IEnumerable<ParkingSpot>> Get() => Ok(_parkingSpotsService.GetParkingSpots());
 
 
     [HttpGet("{id:guid}")]
     public ActionResult<ParkingSpot> Get(Guid id)
     {
-        var parkingSpot = _parkingSpotsService.GetParkingSpots()
-            .SingleOrDefault(x => x.Id == id);
+        var parkingSpot = _parkingSpotsService.GetParkingSpot(id);
         if (parkingSpot is null)
         {
             return NotFound();
@@ -36,28 +34,22 @@ public class ParkingSpotsController : ControllerBase
     [HttpPost]
     public ActionResult Post(ParkingSpot parkingSpot)
     {
-        if (string.IsNullOrWhiteSpace(parkingSpot.Name))
+        if (_parkingSpotsService.AddParkingSpot(parkingSpot) is false)
         {
-            return BadRequest("Parking spot name cannot be empty.");
+            return BadRequest();
         }
-
-        parkingSpot.Id = Guid.NewGuid();
-        parkingSpot.Reservations = new List<Reservation>();
-        _parkingSpotsService.GetParkingSpots().Add(parkingSpot);
+        
         return CreatedAtAction(nameof(Get), new {id = parkingSpot.Id}, null);
     }
-
+    
     [HttpDelete("{id:guid}")]
     public ActionResult Delete(Guid id)
     {
-        var parkingSpot = _parkingSpotsService.GetParkingSpots()
-            .SingleOrDefault(x => x.Id == id);
-        if (parkingSpot is null)
+        if (_parkingSpotsService.DeleteParkingSpot(id) is false)
         {
             return NotFound();
         }
 
-        _parkingSpotsService.GetParkingSpots().Remove(parkingSpot);
         return NoContent();
     }
 }
