@@ -1,26 +1,62 @@
+using MySpot.Api.Commands;
+using MySpot.Api.DTO;
 using MySpot.Api.Models;
 
 namespace MySpot.Api.Services;
 
 public class ParkingSpotsService : IParkingSpotsService
 {
+    private readonly ILogger<ParkingSpotsService> _logger;
     private readonly List<ParkingSpot> _parkingSpots = new();
 
-    public IEnumerable<ParkingSpot> GetParkingSpots() => _parkingSpots;
-
-    public ParkingSpot GetParkingSpot(Guid id) => _parkingSpots.SingleOrDefault(x => x.Id == id);
-
-    public bool AddParkingSpot(ParkingSpot parkingSpot)
+    public ParkingSpotsService(ILogger<ParkingSpotsService> logger)
     {
-        if (string.IsNullOrWhiteSpace(parkingSpot.Name))
+        _logger = logger;
+    }
+
+    public IEnumerable<ParkingSpotDto> GetParkingSpots()
+        => _parkingSpots.Select(x => new ParkingSpotDto
+        {
+            Id = x.Id,
+            Name = x.Name
+        });
+
+    public ParkingSpotDetailsDto GetParkingSpot(Guid id)
+    {
+        var parkingSpot = _parkingSpots.SingleOrDefault(x => x.Id == id);
+
+        return parkingSpot is null
+            ? null
+            : new ParkingSpotDetailsDto
+            {
+                Id = parkingSpot.Id,
+                Name = parkingSpot.Name,
+                Reservations = parkingSpot.Reservations.Select(x =>
+                    new ReservationDto
+                    {
+                        Id = x.Id,
+                        Date = x.Date
+                    }).ToList()
+            };
+    }
+
+    public bool AddParkingSpot(AddParkingSpot command)
+    {
+        if (string.IsNullOrWhiteSpace(command.Name))
         {
             // "Parking spot name cannot be empty."
             return false;
         }
 
-        parkingSpot.Id = Guid.NewGuid();
-        parkingSpot.Reservations = new List<Reservation>();
+        var parkingSpot = new ParkingSpot
+        {
+            Id = command.Id,
+            Name = command.Name,
+            Reservations = new List<Reservation>()
+        };
         _parkingSpots.Add(parkingSpot);
+        _logger.LogInformation("Added a parking with spot ID: {ParkingSpotId}", parkingSpot.Id);
+        
         return true;
     }
 

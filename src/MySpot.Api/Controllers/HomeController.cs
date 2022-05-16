@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using MySpot.Api.Models;
+using Microsoft.Extensions.Options;
 
 namespace MySpot.Api.Controllers;
 
@@ -7,6 +7,13 @@ namespace MySpot.Api.Controllers;
 [Route("")]
 public class HomeController : ControllerBase
 {
+    private readonly string _apiName;
+
+    public HomeController(IOptions<ApiOptions> apiOptions)
+    {
+        _apiName = apiOptions.Value.Name;
+    }
+
     [HttpGet]
-    public string Get() => "Hello world";
+    public string Get() => _apiName;
 }

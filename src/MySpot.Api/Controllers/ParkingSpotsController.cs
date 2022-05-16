@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using MySpot.Api.Commands;
+using MySpot.Api.DTO;
 using MySpot.Api.Models;
 using MySpot.Api.Services;
 
@@ -16,11 +18,11 @@ public class ParkingSpotsController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<ParkingSpot>> Get() => Ok(_parkingSpotsService.GetParkingSpots());
+    public ActionResult<IEnumerable<ParkingSpotDto>> Get() => Ok(_parkingSpotsService.GetParkingSpots());
 
 
     [HttpGet("{id:guid}")]
-    public ActionResult<ParkingSpot> Get(Guid id)
+    public ActionResult<ParkingSpotDetailsDto> Get(Guid id)
     {
         var parkingSpot = _parkingSpotsService.GetParkingSpot(id);
         if (parkingSpot is null)
@@ -32,14 +34,14 @@ public class ParkingSpotsController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult Post(ParkingSpot parkingSpot)
+    public ActionResult Post(AddParkingSpot command)
     {
-        if (_parkingSpotsService.AddParkingSpot(parkingSpot) is false)
+        if (_parkingSpotsService.AddParkingSpot(command) is false)
         {
             return BadRequest();
         }
         
-        return CreatedAtAction(nameof(Get), new {id = parkingSpot.Id}, null);
+        return CreatedAtAction(nameof(Get), new {id = command.Id}, null);
     }
     
     [HttpDelete("{id:guid}")]
