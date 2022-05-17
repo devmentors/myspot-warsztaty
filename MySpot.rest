@@ -15,7 +15,7 @@ POST {{url}}/parking-spots
 Content-Type: application/json
 
 {
-    "name": "P1"
+    "name": ""
 }
 
 

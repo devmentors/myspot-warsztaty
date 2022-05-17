@@ -1,5 +1,6 @@
 using MySpot.Api;
 using MySpot.Api.Commands;
+using MySpot.Api.Middlewares;
 using MySpot.Api.Repositories;
 using MySpot.Api.Services;
 using Serilog;
@@ -22,10 +23,15 @@ builder.Services
     .AddTransient<IParkingSpotRepository, ParkingSpotRepository>()
     .AddSingleton<IParkingSpotsService, ParkingSpotsService>()
     .AddSingleton<IClock, Clock>()
+    .AddSingleton<ErrorHandlerMiddleware>()
+    .AddSingleton<LoggingMiddleware>()
     .Configure<ApiOptions>(builder.Configuration.GetSection("api"))
     .AddControllers();
 
 var app = builder.Build();
+
+app.UseMiddleware<LoggingMiddleware>();
+app.UseMiddleware<ErrorHandlerMiddleware>();
 
 app.MapControllers();
 
