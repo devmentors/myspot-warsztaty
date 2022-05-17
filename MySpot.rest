@@ -1,5 +1,5 @@
 @url = http://localhost:5000
-@parkingSpotId = 7711ff63-afab-4ae6-ad71-09f2afafa60f
+@parkingSpotId = dcffe0a8-061b-4f66-aa7a-883023edb632
 
 ###
 GET {{url}}
@@ -11,11 +11,22 @@ GET {{url}}/parking-spots
 GET {{url}}/parking-spots/{{parkingSpotId}}
 
 ###
+GET {{url}}/api/parking-spots/{{parkingSpotId}}
+
+###
 POST {{url}}/parking-spots
 Content-Type: application/json
 
 {
-    "name": ""
+    "name": "P1"
+}
+
+###
+POST {{url}}/api/parking-spots
+Content-Type: application/json
+
+{
+    "name": "P1"
 }
 
 

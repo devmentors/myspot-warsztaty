@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using MySpot.Api;
 using MySpot.Api.Commands;
 using MySpot.Api.Middlewares;
@@ -26,13 +28,29 @@ builder.Services
     .AddSingleton<ErrorHandlerMiddleware>()
     .AddSingleton<LoggingMiddleware>()
     .Configure<ApiOptions>(builder.Configuration.GetSection("api"))
+    .AddEndpointsApiExplorer()
+    .AddSwaggerGen(swagger =>
+    {
+        swagger.EnableAnnotations();
+        swagger.SwaggerDoc("v1", new OpenApiInfo
+        {
+            Title = "MySpot API",
+            Version = "v1"
+        });
+    })
     .AddControllers();
 
 var app = builder.Build();
 
 app.UseMiddleware<LoggingMiddleware>();
 app.UseMiddleware<ErrorHandlerMiddleware>();
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.MapControllers();
+
+app.MapGet("/api", (IOptions<ApiOptions> apiOptions) => apiOptions.Value.Name);
+
+app.MapParkingSpotsApi();
 
 app.Run();

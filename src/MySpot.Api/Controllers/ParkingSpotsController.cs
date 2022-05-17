@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using MySpot.Api.Commands;
 using MySpot.Api.DTO;
 using MySpot.Api.Services;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace MySpot.Api.Controllers;
 
@@ -24,6 +25,8 @@ public class ParkingSpotsController : ControllerBase
 
 
     [HttpGet("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult<ParkingSpotDetailsDto> Get(Guid id)
     {
         var parkingSpot = _parkingSpotsService.GetParkingSpot(id);
@@ -36,6 +39,9 @@ public class ParkingSpotsController : ControllerBase
     }
 
     [HttpPost]
+    [SwaggerOperation("Add parking spot")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public ActionResult Post(AddParkingSpot command)
     {
         command = command with {Id = Guid.NewGuid()};
